@@ -15,7 +15,7 @@
     <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ '"/>
     <xsl:variable name="nums" select="1234567890"/>
     <!-- Normalize space and case. -->
-    <xsl:variable name="normalized_value" select="translate(normalize-space($value), $uppercase, $lowercase)"/>
+    <xsl:variable name="normalized_value" select="translate($value, $uppercase, $lowercase)"/>
 
     <!-- Grab the qualifier and create a field. -->
     <xsl:variable name="qualifier">

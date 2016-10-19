@@ -29,6 +29,12 @@
       <xsl:with-param name="pid" select="../../@PID"/>
       <xsl:with-param name="datastream" select="../@ID"/>
     </xsl:apply-templates>
+
+    <xsl:apply-templates mode="qualified_date_range" select="$content//mods:mods[1]/mods:originInfo/mods:dateCreated">
+      <xsl:with-param name="prefix" select="$prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="normalize-space(text())"/>
+    </xsl:apply-templates>
   </xsl:template>
 
   <!-- Handle dates. -->
@@ -149,15 +155,6 @@
       <xsl:with-param name="pid" select="$pid"/>
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:call-template>
-
-    <!-- Potential qualified date range for dateCreated. -->
-    <xsl:if test="mods:dateCreated">
-      <xsl:call-template name="qualified_date_range">
-        <xsl:with-param name="prefix" select="$prefix"/>
-        <xsl:with-param name="suffix" select="$suffix"/>
-        <xsl:with-param name="value" select="normalize-space(mods:dateCreated/text())"/>
-      </xsl:call-template>
-    </xsl:if>
   </xsl:template>
 
   <!-- Intercept names with role terms, so we can create copies of the fields
