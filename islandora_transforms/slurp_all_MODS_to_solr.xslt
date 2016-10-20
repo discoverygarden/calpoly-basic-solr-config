@@ -10,6 +10,7 @@
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>
   <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/> -->
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/>
+  <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/qualified_date_range.xslt"/>
   <!-- HashSet to track single-valued fields. -->
   <xsl:variable name="single_valued_hashset" select="java:java.util.HashSet.new()"/>
 
@@ -146,6 +147,23 @@
       <xsl:with-param name="value" select="normalize-space(text())"/>
       <xsl:with-param name="pid" select="$pid"/>
       <xsl:with-param name="datastream" select="$datastream"/>
+    </xsl:call-template>
+
+    <xsl:apply-templates select="mods:dateCreated" mode="qualified_mods_date_range">
+      <xsl:with-param name="prefix" select="concat($prefix, local-name(), '_')"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
+  <!-- Qualified date range for dateCreated. -->
+  <xsl:template mode="qualified_mods_date_range" match="mods:dateCreated">
+    <xsl:param name="prefix"/>
+    <xsl:param name="suffix"/>
+
+    <xsl:call-template name="qualified_date_range">
+      <xsl:with-param name="prefix" select="$prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="normalize-space(text())"/>
     </xsl:call-template>
   </xsl:template>
 
