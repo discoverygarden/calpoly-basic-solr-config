@@ -11,11 +11,6 @@
     <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
     <xsl:param name="value"/>
-    <xsl:call-template name="general_mods_field">
-      <xsl:with-param name="prefix" select="concat($prefix, local-name(), '_testthing_')"/>
-      <xsl:with-param name="suffix" select="$suffix"/>
-      <xsl:with-param name="value">Whatever Goes Here</xsl:with-param>
-    </xsl:call-template>
     <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz_'"/>
     <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ '"/>
     <xsl:variable name="nums" select="1234567890"/>
