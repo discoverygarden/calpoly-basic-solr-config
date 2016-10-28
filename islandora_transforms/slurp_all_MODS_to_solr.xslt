@@ -39,6 +39,7 @@
 
     <xsl:variable name="rawTextValue" select="normalize-space(text())"/>
 
+
     <xsl:variable name="textValue">
       <xsl:call-template name="get_ISO8601_date">
         <xsl:with-param name="date" select="$rawTextValue"/>
@@ -58,6 +59,15 @@
         <xsl:text>_</xsl:text>
       </xsl:for-each>
     </xsl:variable>
+
+    <!-- Extract qualified date ranges. -->
+    <xsl:call-template name="qualified_date_range">
+      <xsl:with-param name="prefix" select="$this_prefix"/>
+      <xsl:with-param name="suffix" select="$suffix"/>
+      <xsl:with-param name="value" select="$rawTextValue"/>
+      <!-- Based on Calpoly's facet settings for mods/originInfo/dateCreated. -->
+      <xsl:with-param name="range_bottom" select="number('1866')"/>
+    </xsl:call-template>
 
     <!-- Prevent multiple generating multiple instances of single-valued fields
          by tracking things in a HashSet -->
@@ -149,22 +159,6 @@
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:call-template>
 
-    <xsl:apply-templates select="mods:dateCreated" mode="qualified_mods_date_range">
-      <xsl:with-param name="prefix" select="concat($prefix, local-name(), '_')"/>
-      <xsl:with-param name="suffix" select="$suffix"/>
-    </xsl:apply-templates>
-  </xsl:template>
-
-  <!-- Qualified date range for dateCreated. -->
-  <xsl:template mode="qualified_mods_date_range" match="mods:dateCreated">
-    <xsl:param name="prefix"/>
-    <xsl:param name="suffix"/>
-
-    <xsl:call-template name="qualified_date_range">
-      <xsl:with-param name="prefix" select="$prefix"/>
-      <xsl:with-param name="suffix" select="$suffix"/>
-      <xsl:with-param name="value" select="normalize-space(text())"/>
-    </xsl:call-template>
   </xsl:template>
 
   <!-- Intercept names with role terms, so we can create copies of the fields
