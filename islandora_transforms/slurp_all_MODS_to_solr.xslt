@@ -61,14 +61,6 @@
       </xsl:for-each>
     </xsl:variable>
 
-    <!-- Extract qualified date ranges. -->
-    <xsl:call-template name="qualified_date_range">
-      <xsl:with-param name="prefix" select="$this_prefix"/>
-      <xsl:with-param name="suffix" select="$suffix"/>
-      <xsl:with-param name="value" select="$rawTextValue"/>
-      <!-- Based on Calpoly's facet settings for mods/originInfo/dateCreated. -->
-      <xsl:with-param name="range_bottom" select="number('1866')"/>
-    </xsl:call-template>
 
     <!-- Prevent multiple generating multiple instances of single-valued fields
          by tracking things in a HashSet -->
@@ -76,6 +68,14 @@
     <!-- The method java.util.HashSet.add will return false when the value is
          already in the set. -->
     <xsl:if test="java:add($single_valued_hashset, $field_name)">
+      <!-- Extract qualified date ranges. -->
+      <xsl:call-template name="qualified_date_range">
+        <xsl:with-param name="prefix" select="$field_name"/>
+        <xsl:with-param name="suffix" select="$suffix"/>
+        <xsl:with-param name="value" select="$rawTextValue"/>
+        <!-- Based on Calpoly's facet settings for originInfo/dateCreated. -->
+        <xsl:with-param name="range_bottom" select="number('1866')"/>
+      </xsl:call-template>
       <xsl:if test="not(normalize-space($textValue)='')">
         <field>
           <xsl:attribute name="name">
