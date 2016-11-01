@@ -75,6 +75,8 @@
         <xsl:with-param name="value" select="$rawTextValue"/>
         <!-- Based on Calpoly's facet settings for originInfo/dateCreated. -->
         <xsl:with-param name="range_bottom" select="number('1866')"/>
+        <!-- Setting to conttinue supporting 'after' dates +20 years. -->
+        <xsl:with-param name="future_proofing" select="number('20')"/>
       </xsl:call-template>
       <xsl:if test="not(normalize-space($textValue)='')">
         <field>
