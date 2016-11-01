@@ -36,7 +36,7 @@
     <xsl:if test="$qualifier != ''">
       <field>
         <xsl:attribute name="name">
-          <xsl:value-of select="concat($prefix, local-name(), '_parsed_qualifier_', $suffix)"/>
+          <xsl:value-of select="concat($prefix, '_parsed_qualifier_', $suffix)"/>
         </xsl:attribute>
         <xsl:value-of select="$qualifier"/>
       </field>
@@ -96,7 +96,7 @@
            dates count as a 'range' of one year. -->
       <xsl:if test="$low_end != '' and $high_end != ''">
         <xsl:call-template name="qdr_year_loop">
-          <xsl:with-param name="prefix" select="concat($prefix, local-name(), '_')"/>
+          <xsl:with-param name="prefix" select="$prefix"/>
           <xsl:with-param name="start" select="$low_end"/>
           <xsl:with-param name="end" select="$high_end"/>
         </xsl:call-template>
@@ -120,7 +120,7 @@
         <xsl:when test="$start = $end">
           <field>
             <xsl:attribute name="name">
-              <xsl:value-of select="concat($prefix, $suffix)"/>
+              <xsl:value-of select="concat($prefix, '_qualified_range_', $suffix)"/>
             </xsl:attribute>
             <!-- Could use the gsearch extensions date formatter, but we're only
                  ever dealing with years currently. -->
