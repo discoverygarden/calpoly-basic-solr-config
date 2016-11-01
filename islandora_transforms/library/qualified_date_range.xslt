@@ -9,7 +9,8 @@
        multivalued field representing the entire range. Uses some pretty lazy
        checks; the current format is "qualifier yyyy(-yyyy)", e.g.,"circa 2001"
        or "between 1992-1997". Intended to mimic the functionality of Solr range
-       fields in Solr < 5.0. -->
+       fields in Solr < 5.0.
+       XXX: Do not use for dates that go into the BCE range! -->
   <xsl:template name="qualified_date_range">
     <xsl:param name="prefix"/>
     <xsl:param name="suffix"/>
@@ -17,6 +18,11 @@
     <!-- This is extremely case-dependent and should be set based on what the
          facet low-end will be set to in Solr queries. -->
     <xsl:param name="range_bottom"/>
+    <!-- Number of years after "NOW" to add dates for; intended to keep a facet
+         end of "NOW" functioning into the future. -->
+    <xsl:param name="future_proofing">
+      <xsl:value-of select="number('0')"/>
+    </xsl:param>
     <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz_'"/>
     <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ '"/>
     <xsl:variable name="nums" select="1234567890"/>
@@ -77,7 +83,7 @@
                of your date fields and you write "after" in a doc for it, don't
                be surprised if you get nonsensical search results. -->
           <xsl:when test="$qualifier = 'after'">
-            <xsl:value-of select="date:year(date:date-time())"/>
+            <xsl:value-of select="date:year(date:date-time()) + $future_proofing"/>
           </xsl:when>
           <!-- Single-valued dates. -->
           <xsl:when test="number($date_portion) = $date_portion and string-length($date_portion) &lt;= 4">
@@ -105,10 +111,10 @@
   </xsl:template>
 
   <!-- Year-looping template. -->
-  <!-- XXX: As selecting "x to y" isn't implemented until XSLT 2.0, and there's
-       no such thing as a "while" or "for", a tail-recursive template has to be
-       the solution here. Avoiding spamming the call stack to death by branching
-       the recursion as we go down. -->
+  <!-- XXX: Iterating over ranges isn't implemented in XSLT 1.0, and GSearch
+       uses Xalan to process XSLT, which doesn't support tail-recursion
+       recognition either, so using a divide and conquer recursive template
+       to lower the call stack depth. -->
   <xsl:template name="qdr_year_loop">
     <xsl:param name="prefix"/>
     <xsl:param name="suffix">mdt</xsl:param>
@@ -120,7 +126,7 @@
         <xsl:when test="$start = $end">
           <field>
             <xsl:attribute name="name">
-              <xsl:value-of select="concat($prefix, '_qualified_range_', $suffix)"/>
+              <xsl:value-of select="concat($prefix, '_', $suffix)"/>
             </xsl:attribute>
             <!-- Could use the gsearch extensions date formatter, but we're only
                  ever dealing with years currently. -->
