@@ -67,16 +67,6 @@
     <!-- The method java.util.HashSet.add will return false when the value is
          already in the set. -->
     <xsl:if test="java:add($single_valued_hashset, $field_name)">
-      <!-- Extract qualified date ranges. -->
-      <xsl:call-template name="qualified_date_range">
-        <xsl:with-param name="prefix" select="$field_name"/>
-        <xsl:with-param name="suffix" select="$suffix"/>
-        <xsl:with-param name="value" select="$rawTextValue"/>
-        <!-- Based on Calpoly's facet settings for originInfo/dateCreated. -->
-        <xsl:with-param name="range_bottom" select="number('1866')"/>
-        <!-- Setting to conttinue supporting 'after' dates +20 years. -->
-        <xsl:with-param name="future_proofing" select="number('20')"/>
-      </xsl:call-template>
       <xsl:if test="not(normalize-space($textValue)='')">
         <field>
           <xsl:attribute name="name">
@@ -95,14 +85,28 @@
       </xsl:if>
     </xsl:if>
 
-    <xsl:if test="not(normalize-space($textValue)='')">
-      <field>
-        <xsl:attribute name="name">
-          <xsl:value-of select="concat($prefix, local-name(), '_mdt')"/>
-        </xsl:attribute>
-        <xsl:value-of select="$textValue"/>
-      </field>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="not(normalize-space($textValue)='')">
+        <field>
+          <xsl:attribute name="name">
+            <xsl:value-of select="concat($prefix, local-name(), '_mdt')"/>
+          </xsl:attribute>
+          <xsl:value-of select="$textValue"/>
+        </field>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- Extract qualified date ranges. -->
+        <xsl:call-template name="qualified_date_range">
+          <xsl:with-param name="prefix" select="$field_name"/>
+          <xsl:with-param name="suffix" select="$suffix"/>
+          <xsl:with-param name="value" select="$rawTextValue"/>
+          <!-- Based on Calpoly's facet settings for originInfo/dateCreated. -->
+          <xsl:with-param name="range_bottom" select="number('1866')"/>
+          <!-- Setting to conttinue supporting 'after' dates +20 years. -->
+          <xsl:with-param name="future_proofing" select="number('20')"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:if test="not(normalize-space($rawTextValue)='')">
       <field>
         <xsl:attribute name="name">
