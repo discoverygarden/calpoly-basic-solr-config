@@ -30,6 +30,10 @@
     </xsl:apply-templates>
   </xsl:template>
 
+  <xsl:template match="mods:relatedItem[@type='host'][mods:location[not(@*)]/mods:physicalLocation[not(@*)]]" mode="slurping_MODS">
+    <!-- client request to not index this path -->
+  </xsl:template>
+
   <!-- Handle dates. -->
   <xsl:template match="mods:*[(@type='date') or (contains(translate(local-name(), 'D', 'd'), 'date'))][normalize-space(text())]" mode="slurping_MODS">
     <xsl:param name="prefix"/>
