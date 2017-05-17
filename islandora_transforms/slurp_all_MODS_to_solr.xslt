@@ -31,11 +31,11 @@
     </xsl:apply-templates>
   </xsl:template>
 
-  <xsl:template match="mods:relatedItem[@type='host'][mods:location[not(@*)]/mods:physicalLocation[not(@*)]]" mode="slurping_MODS">
+  <xsl:template match="mods:relatedItem[@type='host']/mods:location[not(@*)]/mods:physicalLocation[not(@*)]" mode="slurping_MODS">
     <!-- client request to not index this path -->
   </xsl:template>
 
- <xsl:template match="mods:location[not(@*)][mods:physicalLocation[not(@*)]]" mode="slurping_MODS">
+  <xsl:template match="mods:location[not(@*)]/mods:physicalLocation[not(@*)]" mode="slurping_MODS">
     <!-- client request to not index this path -->
   </xsl:template>
 
