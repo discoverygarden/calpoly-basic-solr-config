@@ -5,12 +5,12 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:foxml="info:fedora/fedora-system:def/foxml#"
   xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
      exclude-result-prefixes="mods java">
   <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>-->
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>
   <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/> -->
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/>
+  <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/qualified_date_range.xslt"/>
   <!-- HashSet to track single-valued fields. -->
   <xsl:variable name="single_valued_hashset" select="java:java.util.HashSet.new()"/>
 
@@ -30,6 +30,14 @@
     </xsl:apply-templates>
   </xsl:template>
 
+  <xsl:template match="mods:relatedItem[@type='host']/mods:location[not(@*)]/mods:physicalLocation[not(@*)]" mode="slurping_MODS">
+    <!-- client request to not index this path -->
+  </xsl:template>
+
+  <xsl:template match="mods:location[not(@*)]/mods:physicalLocation[not(@*)]" mode="slurping_MODS">
+    <!-- client request to not index this path -->
+  </xsl:template>
+
   <!-- Handle dates. -->
   <xsl:template match="mods:*[(@type='date') or (contains(translate(local-name(), 'D', 'd'), 'date'))][normalize-space(text())]" mode="slurping_MODS">
     <xsl:param name="prefix"/>
@@ -38,6 +46,7 @@
     <xsl:param name="datastream">not provided</xsl:param>
 
     <xsl:variable name="rawTextValue" select="normalize-space(text())"/>
+
 
     <xsl:variable name="textValue">
       <xsl:call-template name="get_ISO8601_date">
@@ -58,6 +67,7 @@
         <xsl:text>_</xsl:text>
       </xsl:for-each>
     </xsl:variable>
+
 
     <!-- Prevent multiple generating multiple instances of single-valued fields
          by tracking things in a HashSet -->
@@ -83,14 +93,29 @@
       </xsl:if>
     </xsl:if>
 
-    <xsl:if test="not(normalize-space($textValue)='')">
-      <field>
-        <xsl:attribute name="name">
-          <xsl:value-of select="concat($prefix, local-name(), '_mdt')"/>
-        </xsl:attribute>
-        <xsl:value-of select="$textValue"/>
-      </field>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="not(normalize-space($textValue)='')">
+        <field>
+          <xsl:attribute name="name">
+            <xsl:value-of select="concat($prefix, local-name(), '_mdt')"/>
+          </xsl:attribute>
+          <xsl:value-of select="$textValue"/>
+        </field>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- Extract qualified date ranges. -->
+        <xsl:call-template name="qualified_date_range">
+          <xsl:with-param name="prefix" select="$field_name"/>
+          <xsl:with-param name="suffix" select="$suffix"/>
+          <xsl:with-param name="value" select="$rawTextValue"/>
+          <!-- Based on Calpoly's facet settings for originInfo/dateCreated. -->
+          <xsl:with-param name="range_bottom" select="number('1866')"/>
+          <!-- Setting to conttinue supporting 'after' dates +20 years. -->
+          <xsl:with-param name="future_proofing" select="number('20')"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+
     <xsl:if test="not(normalize-space($rawTextValue)='')">
       <field>
         <xsl:attribute name="name">
@@ -148,6 +173,7 @@
       <xsl:with-param name="pid" select="$pid"/>
       <xsl:with-param name="datastream" select="$datastream"/>
     </xsl:call-template>
+
   </xsl:template>
 
   <!-- Intercept names with role terms, so we can create copies of the fields
@@ -324,30 +350,7 @@
         <xsl:value-of select="$node/@authorityURI"/>
       </field>
     </xsl:if>
-    <xsl:if test="normalize-space($node/@valueURI)">
-      <field>
-        <xsl:attribute name="name">
-          <xsl:value-of select="concat($prefix, 'valueURI_', $suffix)"/>
-        </xsl:attribute>
-        <xsl:value-of select="$node/@valueURI"/>
-      </field>
-    </xsl:if>
-    <xsl:if test="normalize-space($node/@xlink:href)">
-      <field>
-        <xsl:attribute name="name">
-          <xsl:value-of select="concat($prefix, 'xlinkhref_', $suffix)"/>
-        </xsl:attribute>
-        <xsl:value-of select="$node/@xlink:href"/>
-      </field>
-    </xsl:if>
-    <xsl:if test="normalize-space($node/@displayLabel)">
-      <field>
-        <xsl:attribute name="name">
-          <xsl:value-of select="concat($prefix, 'displayLabel_', $suffix)"/>
-        </xsl:attribute>
-        <xsl:value-of select="$node/@displayLabel"/>
-      </field>
-    </xsl:if>
+
     <xsl:apply-templates select="$node/*" mode="slurping_MODS">
       <xsl:with-param name="prefix" select="$prefix"/>
       <xsl:with-param name="suffix" select="$suffix"/>
