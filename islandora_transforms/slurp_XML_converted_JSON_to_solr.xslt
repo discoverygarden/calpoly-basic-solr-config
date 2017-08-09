@@ -8,7 +8,7 @@
     <xsl:param name="prefix" select="concat('json_', ../@ID, '_')"/>
     <xsl:param name="suffix">ms</xsl:param>
     <xsl:param name="root_node">json</xsl:param>
-    
+
     <xsl:apply-templates mode="index_converted_json" select="$content/*[local-name() = $root_node]">
       <xsl:with-param name="prefix" select="$prefix"/>
       <xsl:with-param name="suffix" select="$suffix"/>

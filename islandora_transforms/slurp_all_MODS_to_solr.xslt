@@ -12,6 +12,7 @@
   <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/> -->
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/manuscript_finding_aid.xslt"/>
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/qualified_date_range.xslt"/>
+
   <!-- HashSet to track single-valued fields. -->
   <xsl:variable name="single_valued_hashset" select="java:java.util.HashSet.new()"/>
 
@@ -48,7 +49,6 @@
 
     <xsl:variable name="rawTextValue" select="normalize-space(text())"/>
 
-
     <xsl:variable name="textValue">
       <xsl:call-template name="get_ISO8601_date">
         <xsl:with-param name="date" select="$rawTextValue"/>
@@ -68,7 +68,6 @@
         <xsl:text>_</xsl:text>
       </xsl:for-each>
     </xsl:variable>
-
 
     <!-- Prevent multiple generating multiple instances of single-valued fields
          by tracking things in a HashSet -->
@@ -116,6 +115,7 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
+
     <xsl:if test="not(normalize-space($rawTextValue)='')">
       <field>
         <xsl:attribute name="name">
