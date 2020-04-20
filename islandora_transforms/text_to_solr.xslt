@@ -11,13 +11,14 @@
       foxml:datastream/foxml:datastreamVersion[last() and @MIMETYPE='text/plain']" name="index_text">
 
     <xsl:param name="content"/>
-
-    <field>
-      <xsl:attribute name="name">
-        <xsl:value-of select="concat(../@ID, '_t')"/>
-      </xsl:attribute>
-      <xsl:value-of select="$content"/>
-  </field>
+    <xsl:if test="not(../@ID = 'RELATED_OBJECTS')">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat(../@ID, '_t')"/>
+        </xsl:attribute>
+        <xsl:value-of select="$content"/>
+      </field>
+    </xsl:if>
 
   </xsl:template>
 </xsl:stylesheet>
